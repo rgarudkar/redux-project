@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/cartSlice";
+import { getProducts } from "../store/productSlice";
 
 const Product = () => {
-  const [products, setProducts] = useState([]);
   const dispatch = useDispatch();
+  const {data,status} = useSelector((state) => state.products);
 
   useEffect(() => {
-    fetch("https://fakestoreapi.com/products")
-      .then((res) => res.json())
-      .then((result) => setProducts(result));
+    dispatch(getProducts());  
   }, []);
 
   const addProduct = (product) => {
@@ -20,7 +19,15 @@ const Product = () => {
     };  
   };
 
-  const cards = products.map((product) => (
+  if(status === 'loading'){
+    return <h2 className="text-center">Loading...</h2>
+  }
+
+  if(status === 'error'){
+    return <h2 className="text-center">Something went wrong!</h2>
+  }
+
+  const cards = data.map((product) => (
     <div className="col-md-3" style={{ marginBottom: "10px" }}>
       <Card key={product.id} className="h-100">
         <div className="text-center">
